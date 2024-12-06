@@ -1,4 +1,42 @@
 {
-  "users": [],
-  "items": []
+  "users": [
+    {
+      "email": "bodiiusa@gmail.com",
+      "password": "$2a$10$rsWGXWpRBrWVQpYWOoZ7xu2Mq8y3SYAxvGKP04RZcJNFhGGhURcnO",
+      "name": "abdullah1111",
+      "isVerified": false,
+      "id": "1733337678980"
+    }
+  ],
+  "items": [
+    {
+      "name": "aou card",
+      "description": "",
+      "purchaseDate": "2024-12-01",
+      "condition": "good",
+      "locationId": 1733337706930,
+      "categoryId": 1733337701132,
+      "userId": "1733337678980",
+      "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAACECAYAAABRRIOnAAAAAklEQVR4AewaftIAAAOPSURBVO3BQY7rVgADweaD73/lziwChCsBgmznT8Kq+IOZvx1mymGmHGbKYaYcZsphphxmymGmHGbKYaYcZsphphxmymGmHGbKi4eS8E0qLQlNpSWhqVxJwhWVloSm0pLwTSpPHGbKYaYcZsqLN1N5pyTckYSm0pJwRaUl4YrKHSrvlIR3OsyUw0w5zJQXH5aEO1SeUGlJaCpXktBUWhKayhNJuEPlkw4z5TBTDjPlxS+nckWlJaGp3KHSktBUfrPDTDnMlMNMefHLJeEOlZaE+cdhphxmymGmvPgwlU9SeULlShKayjup/EkOM+UwUw4z5cWbJeGbktBUWhKaSktCU/mkJPzJDjPlMFMOMyX+4D8kCU3ljiQ0lZaEpvJfcpgph5lymCkvHkpCU7mShE9SaUloKp+UhKZyJQlNpSXhDpUnDjPlMFMOMyX+4A+ShKZyJQlN5UoSmkpLwh0qdyThDpVvOsyUw0w5zJQXDyXhDpU7ktBUmkpLQlN5QqUloSXhDpUrSWhJaCotCU3licNMOcyUw0yJP/igJNyhckcSmsodSbiiciUJTaUloalcScIdKu90mCmHmXKYKS8eSsIdKi0JLQlPJOGTkvBEEprKFZWWhJaEpvLEYaYcZsphpsQfPJCEpvJEEprKlSQ0lZaEpnIlCU+oXEnCFZV/02GmHGbKYaa8eLMkNJUnktBUriShqbQk3KHSktBUWhKayhNJaCotCU3licNMOcyUw0x58WYqdyThisoVlZaEO1SeSMIdKleScCUJTeWdDjPlMFMOM+XFlyWhqVxJwhWVK0loKnck4Ykk/CaHmXKYKYeZEn/wiyWhqbQkvJNKS0JTuSMJV1S+6TBTDjPlMFNePJSEb1K5koQ7VD4pCU3likpLQlNpSWgqTxxmymGmHGbKizdTeackPKFyJQlNpSXhCZU7ktBUWhKayjsdZsphphxmyosPS8IdKk+oPJGEJ5LwSSotCU3licNMOcyUw0x58T+nciUJTaUl4QmVloSWhG86zJTDTDnMlBe/nEpLwhWVloSmciUJTeWJJDSVK0n4pMNMOcyUw0x58WEq36TSknBF5Q6VO5LQVO5IwjcdZsphphxmyos3S8I3JaGpNJU7knAlCVdUriThShKaypUkvNNhphxmymGmxB/M/O0wUw4z5TBTDjPlMFMOM+UwUw4z5TBTDjPlMFMOM+UwUw4z5TBT/gJzpo4dIgR9/wAAAABJRU5ErkJggg==",
+      "id": "1733370643225",
+      "createdAt": "2024-12-05T03:50:43.225Z"
+    }
+  ],
+  "locations": [
+    {
+      "name": "car",
+      "description": "",
+      "userId": "1733337678980",
+      "id": "1733337706930"
+    }
+  ],
+  "categories": [
+    {
+      "name": "personal",
+      "description": "",
+      "color": "#1976d2",
+      "userId": "1733337678980",
+      "id": "1733337701132"
+    }
+  ]
 }

@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import axios from 'axios';
+import api from '../services/api';
 
 interface Location {
   id: number;
@@ -41,28 +41,23 @@ export default function LocationManager() {
 
   const fetchLocations = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3001/api/locations', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setLocations(response.data);
+      const response = await api.get('/api/locations');
+      setLocations(response.data.locations || []);
     } catch (error) {
-      setError('Failed to fetch locations');
+      console.error('Error fetching locations:', error);
+      setError('Failed to load locations');
+      setLocations([]);
     }
   };
 
   const handleAddLocation = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        'http://localhost:3001/api/locations',
-        newLocation,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post('/api/locations', newLocation);
       setSuccess('Location added successfully');
       setNewLocation({ name: '', description: '' });
       fetchLocations();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error adding location:', error);
       setError('Failed to add location');
     }
   };
@@ -71,29 +66,23 @@ export default function LocationManager() {
     if (!editLocation) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:3001/api/locations/${editLocation.id}`,
-        editLocation,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/api/locations/${editLocation.id}`, editLocation);
       setSuccess('Location updated successfully');
       setDialogOpen(false);
       fetchLocations();
     } catch (error) {
+      console.error('Error updating location:', error);
       setError('Failed to update location');
     }
   };
 
   const handleDeleteLocation = async (id: number) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3001/api/locations/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/locations/${id}`);
       setSuccess('Location deleted successfully');
       fetchLocations();
     } catch (error) {
+      console.error('Error deleting location:', error);
       setError('Failed to delete location');
     }
   };

@@ -49,7 +49,16 @@ interface GearItem {
   categoryId?: number;
   locationId?: number;
   condition?: string;
-  purchaseDate?: string;
+  purchaseDate?: string | null;
+}
+
+interface GearFormData {
+  name: string;
+  description: string;
+  categoryId: string;
+  locationId: string;
+  condition: string;
+  purchaseDate: string;
 }
 
 interface SnackbarState {
@@ -91,13 +100,13 @@ function GearTracker() {
   const [gear, setGear] = useState<GearItem[]>([]);
   const [openGearDialog, setOpenGearDialog] = useState(false);
   const [selectedGear, setSelectedGear] = useState<GearItem | null>(null);
-  const [gearForm, setGearForm] = useState({
+  const [gearForm, setGearForm] = useState<GearFormData>({
     name: '',
     description: '',
     categoryId: '',
     locationId: '',
     condition: '',
-    purchaseDate: null
+    purchaseDate: ''
   });
 
   const [openQRDialog, setOpenQRDialog] = useState(false);
@@ -134,7 +143,7 @@ function GearTracker() {
         categoryId: gear.categoryId?.toString() || '',
         locationId: gear.locationId?.toString() || '',
         condition: gear.condition || '',
-        purchaseDate: gear.purchaseDate || null
+        purchaseDate: gear.purchaseDate || ''
       });
     } else {
       setSelectedGear(null);
@@ -144,7 +153,7 @@ function GearTracker() {
         categoryId: '',
         locationId: '',
         condition: '',
-        purchaseDate: null
+        purchaseDate: ''
       });
     }
     setOpenGearDialog(true);
@@ -176,13 +185,13 @@ function GearTracker() {
       };
 
       if (selectedGear) {
-        await axios.put(`http://localhost:3001/api/gear/${selectedGear.id}`, {
+        await axios.put(`http://localhost:3001/api/items/${selectedGear.id}`, {
           ...gearForm,
           categoryId: gearForm.categoryId ? parseInt(gearForm.categoryId) : null,
           locationId: gearForm.locationId ? parseInt(gearForm.locationId) : null
         }, config);
       } else {
-        await axios.post('http://localhost:3001/api/gear', {
+        await axios.post('http://localhost:3001/api/items', {
           ...gearForm,
           categoryId: gearForm.categoryId ? parseInt(gearForm.categoryId) : null,
           locationId: gearForm.locationId ? parseInt(gearForm.locationId) : null
@@ -249,7 +258,7 @@ function GearTracker() {
         }
       };
 
-      await axios.delete(`http://localhost:3001/api/gear/${id}`, config);
+      await axios.delete(`http://localhost:3001/api/items/${id}`, config);
       fetchGear();
       setSnackbar({
         open: true,
@@ -293,12 +302,12 @@ function GearTracker() {
         return;
       }
 
-      const response = await axios.get('http://localhost:3001/api/gear', {
+      const response = await axios.get('http://localhost:3001/api/items', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      setGear(response.data);
+      setGear(response.data.items || []); 
     } catch (error) {
       console.error('Error fetching gear:', error);
       setSnackbar({
@@ -306,6 +315,7 @@ function GearTracker() {
         message: 'Error fetching gear items',
         severity: 'error'
       });
+      setGear([]); 
     }
   };
 
@@ -482,7 +492,7 @@ function GearTracker() {
                     label="Purchase Date"
                     type="date"
                     value={gearForm.purchaseDate}
-                    onChange={(e) => setGearForm({ ...gearForm, purchaseDate: e.target.value })}
+                    onChange={(e) => setGearForm({ ...gearForm, purchaseDate: e.target.value || '' })}
                   />
                 </Grid>
               </Grid>

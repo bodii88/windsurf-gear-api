@@ -7,12 +7,12 @@ import {
   IconButton,
   Box,
   Fab,
-  Dialog,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import GearDetails from './GearDetails';
+import api from '../services/api';
 
 interface GearItem {
   id: number;
@@ -30,18 +30,11 @@ export default function ItemsGrid() {
 
   const fetchItems = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://crayfish-endless-stork.ngrok-free.app/api/gear', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data);
-      }
+      const response = await api.get('/api/items');
+      setItems(response.data.items || []); // Extract items array from response
     } catch (error) {
       console.error('Error fetching items:', error);
+      setItems([]); // Set empty array on error
     }
   };
 
@@ -51,68 +44,57 @@ export default function ItemsGrid() {
 
   const handleDelete = async (id: number) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`https://crayfish-endless-stork.ngrok-free.app/api/gear/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        fetchItems();
-      }
+      await api.delete(`/api/items/${id}`);
+      fetchItems();
     } catch (error) {
       console.error('Error deleting item:', error);
     }
   };
 
-  const handleEdit = (id: number) => {
-    setSelectedItem(id);
-    setIsDialogOpen(true);
-  };
-
-  const handleAdd = () => {
-    setSelectedItem(undefined);
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setSelectedItem(undefined);
-    fetchItems();
-  };
-
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Grid container spacing={3}>
         {items.map((item) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-            <Card sx={{ height: '100%' }}>
+          <Grid item xs={12} sm={6} md={4} key={item.id}>
+            <Card>
               <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                  <Typography variant="h6" noWrap sx={{ flex: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <Typography variant="h6" component="div">
                     {item.name}
                   </Typography>
                   <Box>
-                    <IconButton size="small" onClick={() => handleEdit(item.id)}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => {
+                        setSelectedItem(item.id);
+                        setIsDialogOpen(true);
+                      }}
+                      aria-label="edit item"
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton size="small" onClick={() => handleDelete(item.id)}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleDelete(item.id)}
+                      aria-label="delete item"
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </Box>
                 </Box>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Typography color="text.secondary">
                   Category: {item.category}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Typography variant="body2">
                   Condition: {item.condition}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Purchased: {new Date(item.purchase_date).toLocaleDateString()}
-                </Typography>
+                {item.purchase_date && (
+                  <Typography variant="body2">
+                    Purchased: {new Date(item.purchase_date).toLocaleDateString()}
+                  </Typography>
+                )}
                 {item.notes && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ mt: 1 }}>
                     Notes: {item.notes}
                   </Typography>
                 )}
@@ -120,33 +102,31 @@ export default function ItemsGrid() {
             </Card>
           </Grid>
         ))}
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Fab 
+              color="primary" 
+              onClick={() => {
+                setSelectedItem(undefined);
+                setIsDialogOpen(true);
+              }}
+              aria-label="add new item"
+            >
+              <AddIcon />
+            </Fab>
+          </Box>
+        </Grid>
       </Grid>
 
-      <Fab
-        color="primary"
-        onClick={handleAdd}
-        sx={{
-          position: 'fixed',
-          right: 24,
-          bottom: 24,
-        }}
-      >
-        <AddIcon />
-      </Fab>
-
-      <Dialog
+      <GearDetails
         open={isDialogOpen}
-        onClose={handleDialogClose}
-        maxWidth="sm"
-        fullWidth
-      >
-        <GearDetails
-          open={isDialogOpen}
-          gearId={selectedItem}
-          onClose={handleDialogClose}
-          onUpdate={fetchItems}
-        />
-      </Dialog>
+        gearId={selectedItem}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setSelectedItem(undefined);
+        }}
+        onUpdate={fetchItems}
+      />
     </Box>
   );
 }

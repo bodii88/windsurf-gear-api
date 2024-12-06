@@ -26,6 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { format } from 'date-fns';
+import api from '../services/api';
 
 interface GearDetailsProps {
   open: boolean;
@@ -117,45 +118,39 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/categories', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data);
+      const response = await api.get('/api/categories');
+      if (response.data && response.data.categories) {
+        setCategories(response.data.categories);
+      } else {
+        setCategories([]);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategories([]);
     }
   };
 
   const fetchLocations = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/locations', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setLocations(data);
+      const response = await api.get('/api/locations');
+      if (response.data && response.data.locations) {
+        setLocations(response.data.locations);
+      } else {
+        setLocations([]);
       }
     } catch (error) {
       console.error('Error fetching locations:', error);
+      setLocations([]);
     }
   };
 
   const fetchGearDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/gear/${gearId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setFormData(data);
-        if (data.purchaseDate) {
-          setSelectedDate(new Date(data.purchaseDate));
+      const response = await api.get(`/api/items/${gearId}`);
+      if (response.data) {
+        setFormData(response.data);
+        if (response.data.purchaseDate) {
+          setSelectedDate(new Date(response.data.purchaseDate));
         }
       }
     } catch (error) {
@@ -166,13 +161,9 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
   const fetchBoxes = async () => {
     if (!gearId) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/gear/${gearId}/boxes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setBoxes(data);
+      const response = await api.get(`/api/items/${gearId}/boxes`);
+      if (response.data) {
+        setBoxes(response.data);
       }
     } catch (error) {
       console.error('Error fetching boxes:', error);
@@ -183,13 +174,9 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
     if (!gearId) return;
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/maintenance/${gearId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMaintenanceRecords(data);
+      const response = await api.get(`/api/maintenance/${gearId}`);
+      if (response.data) {
+        setMaintenanceRecords(response.data);
       }
     } catch (error) {
       console.error('Error fetching maintenance records:', error);
@@ -210,7 +197,6 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
     
     if (!formData.name) {
       console.error('Name is required');
@@ -220,12 +206,6 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
     console.log('Submitting form data:', formData); // Debug log
     
     try {
-      const url = gearId 
-        ? `http://localhost:3001/api/gear/${gearId}`
-        : 'http://localhost:3001/api/gear';
-        
-      const method = gearId ? 'PUT' : 'POST';
-
       const requestData = {
         name: formData.name.trim(),
         description: formData.description?.trim() || '',
@@ -235,25 +215,16 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
         categoryId: formData.categoryId
       };
 
-      console.log('Sending request:', { url, method, data: requestData }); // Debug log
+      console.log('Sending request:', requestData); // Debug log
       
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Server error:', error);
-        throw new Error(error.message || 'Failed to save gear');
+      let response;
+      if (gearId) {
+        response = await api.put(`/api/items/${gearId}`, requestData);
+      } else {
+        response = await api.post('/api/items', requestData);
       }
 
-      const result = await response.json();
-      console.log('Server response:', result); // Debug log
+      console.log('Server response:', response.data); // Debug log
 
       onUpdate();
       onClose();
@@ -266,22 +237,13 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
     if (!gearId || !newBoxName) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/gear/${gearId}/boxes`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: newBoxName,
-          description: newBoxDescription,
-        }),
+      const response = await api.post(`/api/items/${gearId}/boxes`, {
+        name: newBoxName,
+        description: newBoxDescription,
       });
 
-      if (response.ok) {
-        const newBox = await response.json();
-        setBoxes([...boxes, newBox]);
+      if (response.data) {
+        setBoxes([...boxes, response.data]);
         setNewBoxName('');
         setNewBoxDescription('');
       }
@@ -292,17 +254,8 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
 
   const handleDeleteBox = async (boxId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/gear/${gearId}/boxes/${boxId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        setBoxes(boxes.filter(box => box.id !== boxId));
-      }
+      await api.delete(`/api/items/${gearId}/boxes/${boxId}`);
+      setBoxes(boxes.filter(box => box.id !== boxId));
     } catch (error) {
       console.error('Error deleting box:', error);
     }
@@ -312,23 +265,15 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
     if (!gearId || !newMaintenanceDate) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/maintenance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          gear_id: gearId,
-          date: format(newMaintenanceDate, 'yyyy-MM-dd'),
-          type: newMaintenanceType,
-          description: newMaintenanceDescription,
-          cost: parseFloat(newMaintenanceCost) || 0
-        }),
+      const response = await api.post('/api/maintenance', {
+        gear_id: gearId,
+        date: format(newMaintenanceDate, 'yyyy-MM-dd'),
+        type: newMaintenanceType,
+        description: newMaintenanceDescription,
+        cost: parseFloat(newMaintenanceCost) || 0
       });
 
-      if (response.ok) {
+      if (response.data) {
         setNewMaintenanceDate(new Date());
         setNewMaintenanceType('');
         setNewMaintenanceDescription('');
@@ -343,16 +288,9 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
 
   const handleDeleteMaintenanceRecord = async (id: number) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/maintenance/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        fetchMaintenanceRecords();
-        onUpdate();
-      }
+      await api.delete(`/api/maintenance/${id}`);
+      fetchMaintenanceRecords();
+      onUpdate();
     } catch (error) {
       console.error('Error deleting maintenance record:', error);
     }
@@ -370,8 +308,19 @@ export default function GearDetails({ open, gearId, onClose, onUpdate }: GearDet
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>{gearId ? 'Edit Gear' : 'Add New Gear'}</DialogTitle>
+      <Dialog 
+        open={open} 
+        onClose={onClose}
+        maxWidth="md"
+        fullWidth
+        disableEscapeKeyDown={false}
+        keepMounted={false}
+        onBackdropClick={onClose}
+        aria-labelledby="gear-details-dialog-title"
+      >
+        <DialogTitle id="gear-details-dialog-title">
+          {gearId ? 'Edit Gear' : 'Add New Gear'}
+        </DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
             <TextField

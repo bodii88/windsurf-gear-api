@@ -47,9 +47,11 @@ export default function CategoryManager() {
       const response = await axios.get('http://localhost:3001/api/categories', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCategories(response.data);
+      setCategories(response.data.categories || []);
     } catch (error) {
-      setError('Failed to fetch categories');
+      console.error('Error fetching categories:', error);
+      setError('Failed to load categories');
+      setCategories([]);
     }
   };
 
