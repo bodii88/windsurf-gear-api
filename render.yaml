@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: windsurf-gear-api
+    env: node
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://windsurf-gear.onrender.com
+      - key: OPENWEATHER_API_KEY
+        sync: false
