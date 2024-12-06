@@ -1,0 +1,38 @@
+// This is a backup of the original App.tsx
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Tabs,
+  Tab,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Snackbar,
+  Alert,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import { QRCodeCanvas } from 'qrcode.react';
+import { saveAs } from 'file-saver';
+import axios from 'axios';
+
+// Original content of App.tsx goes here
