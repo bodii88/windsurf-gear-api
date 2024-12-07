@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windsurf Gear API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 3px;
+        }
+        .method {
+            font-weight: bold;
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Windsurf Gear API</h1>
+    <div class="container">
+        <h2>API Status: Online</h2>
+        <p>The Windsurf Gear API is running. This is the backend service for the Windsurf Gear application.</p>
+        
+        <h3>Available Endpoints:</h3>
+        <div class="endpoint">
+            <span class="method">GET</span> /api/health - Health check endpoint
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> /api/auth/register - User registration
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> /api/auth/login - User login
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> /api/categories - Get all categories
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> /api/items - Get all items
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> /api/locations - Get all locations
+        </div>
+    </div>
+</body>
+</html>

@@ -11,7 +11,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/categories');
 const locationRoutes = require('./routes/locations');
-const itemRoutes = require('./routes/items'); // Added back itemRoutes
+const itemRoutes = require('./routes/items'); 
 
 const app = express();
 
@@ -85,7 +85,7 @@ app.use((err, req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/locations', locationRoutes);
-app.use('/api/items', itemRoutes); // Added back itemRoutes
+app.use('/api/items', itemRoutes); 
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -97,15 +97,34 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Handle production static assets
+// Serve static files from the public directory if it exists
 if (process.env.NODE_ENV === 'production') {
-    // Serve static files
-    app.use(express.static(path.join(__dirname, '../public')));
-
-    // Handle SPA routing
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
-    });
+    const publicPath = path.join(__dirname, '../public');
+    
+    // Log the public directory path for debugging
+    console.log('Public directory path:', publicPath);
+    
+    // Check if public directory exists
+    const fs = require('fs');
+    if (fs.existsSync(publicPath)) {
+        console.log('Public directory exists');
+        app.use(express.static(publicPath));
+        
+        // Handle SPA routing - send all requests to index.html
+        app.get('*', (req, res) => {
+            if (!req.path.startsWith('/api/')) {
+                const indexPath = path.join(publicPath, 'index.html');
+                if (fs.existsSync(indexPath)) {
+                    res.sendFile(indexPath);
+                } else {
+                    console.log('index.html not found at:', indexPath);
+                    res.status(404).send('Not found');
+                }
+            }
+        });
+    } else {
+        console.log('Public directory does not exist');
+    }
 }
 
 // Graceful shutdown
